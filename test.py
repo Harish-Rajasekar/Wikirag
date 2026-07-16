@@ -1,33 +1,30 @@
 from src.wikipedia_loader import WikipediaLoader
 from src.text_splitter import TextSplitter
+from src.embeddings import EmbeddingGenerator
 
 
 def main():
 
     loader = WikipediaLoader()
     splitter = TextSplitter()
+    embedder = EmbeddingGenerator()
 
     topic = input("Enter a Wikipedia topic: ")
 
-    try:
-        article = loader.get_article(topic)
+    article = loader.get_article(topic)
 
-        chunks = splitter.split_text(article["content"])
+    chunks = splitter.split_text(article["content"])
 
-        print(f"\nTotal Chunks: {len(chunks)}")
+    embeddings = embedder.generate_embeddings(chunks)
 
-        print("\n" + "=" * 60)
-        print("FIRST CHUNK")
-        print("=" * 60)
-        print(chunks[0])
+    print("\nTotal Chunks :", len(chunks))
+    print("Embedding Shape :", embeddings.shape)
 
-        print("\n" + "=" * 60)
-        print("SECOND CHUNK")
-        print("=" * 60)
-        print(chunks[1])
+    print("\nFirst Chunk:\n")
+    print(chunks[0][:300])
 
-    except ValueError as e:
-        print(e)
+    print("\nFirst Embedding (First 10 Values):\n")
+    print(embeddings[0][:10])
 
 
 if __name__ == "__main__":
