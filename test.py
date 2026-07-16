@@ -42,13 +42,22 @@ retriever = Retriever()
 query = input("\nAsk a question: ")
 
 results = retriever.retrieve(query)
+context_chunks = results["documents"][0]
 
-print("\nRetrieved Chunks:\n")
+from src.prompt import PromptBuilder
+from src.llm import GeminiClient
 
-for i, doc in enumerate(results["documents"][0], start=1):
+prompt = PromptBuilder.build_prompt(
+    context_chunks,
+    query
+)
 
-    print("=" * 80)
-    print(f"Chunk {i}")
-    print("=" * 80)
-    print(doc[:500])
-    print()
+llm = GeminiClient()
+
+answer = llm.generate_answer(prompt)
+
+print("\n")
+print("=" * 80)
+print("ANSWER")
+print("=" * 80)
+print(answer)
