@@ -1,31 +1,54 @@
 from src.wikipedia_loader import WikipediaLoader
 from src.text_splitter import TextSplitter
 from src.embeddings import EmbeddingGenerator
+from src.vector_store import VectorStore
+from src.retriever import Retriever
 
 
-def main():
+loader = WikipediaLoader()
+splitter = TextSplitter()
+embedder = EmbeddingGenerator()
+store = VectorStore()
 
-    loader = WikipediaLoader()
-    splitter = TextSplitter()
-    embedder = EmbeddingGenerator()
+topic = input("Enter Wikipedia topic: ")
 
-    topic = input("Enter a Wikipedia topic: ")
+article = loader.get_article(topic)
 
-    article = loader.get_article(topic)
+chunks = splitter.split_text(article["content"])
 
-    chunks = splitter.split_text(article["content"])
+embeddings = embedder.generate_embeddings(chunks)
 
-    embeddings = embedder.generate_embeddings(chunks)
+metadata = []
 
-    print("\nTotal Chunks :", len(chunks))
-    print("Embedding Shape :", embeddings.shape)
+for i in range(len(chunks)):
+    metadata.append(
+        {
+            "title": article["title"],
+            "url": article["url"],
+            "chunk_id": i
+        }
+    )
 
-    print("\nFirst Chunk:\n")
-    print(chunks[0][:300])
+store.add_documents(
+    chunks,
+    embeddings,
+    metadata
+)
 
-    print("\nFirst Embedding (First 10 Values):\n")
-    print(embeddings[0][:10])
+print("\nDatabase Ready!")
 
+retriever = Retriever()
 
-if __name__ == "__main__":
-    main()
+query = input("\nAsk a question: ")
+
+results = retriever.retrieve(query)
+
+print("\nRetrieved Chunks:\n")
+
+for i, doc in enumerate(results["documents"][0], start=1):
+
+    print("=" * 80)
+    print(f"Chunk {i}")
+    print("=" * 80)
+    print(doc[:500])
+    print()
