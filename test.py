@@ -1,26 +1,30 @@
 from src.wikipedia_loader import WikipediaLoader
+from src.text_splitter import TextSplitter
 
 
 def main():
 
     loader = WikipediaLoader()
+    splitter = TextSplitter()
 
     topic = input("Enter a Wikipedia topic: ")
 
     try:
         article = loader.get_article(topic)
 
-        print("\n" + "=" * 60)
-        print("TITLE")
-        print(article["title"])
+        chunks = splitter.split_text(article["content"])
+
+        print(f"\nTotal Chunks: {len(chunks)}")
 
         print("\n" + "=" * 60)
-        print("SUMMARY")
-        print(article["summary"][:500])
+        print("FIRST CHUNK")
+        print("=" * 60)
+        print(chunks[0])
 
         print("\n" + "=" * 60)
-        print("URL")
-        print(article["url"])
+        print("SECOND CHUNK")
+        print("=" * 60)
+        print(chunks[1])
 
     except ValueError as e:
         print(e)
