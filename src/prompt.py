@@ -1,23 +1,40 @@
 class PromptBuilder:
     """
-    Builds prompts for the LLM using retrieved context.
+    Builds prompts for the LLM using retrieved context and chat history.
     """
 
     @staticmethod
-    def build_prompt(context_chunks, question):
-        """
-        Create a prompt using the retrieved chunks and user question.
-        """
+    def build_prompt(context_chunks, question, chat_history=None):
 
         context = "\n\n".join(context_chunks)
 
+        history = ""
+
+        if chat_history:
+            history = "\n".join(
+                [
+                    f"User: {msg['user']}\nAssistant: {msg['assistant']}"
+                    for msg in chat_history
+                ]
+            )
+
         prompt = f"""
-You are an AI assistant.
+You are an AI assistant answering questions about the currently loaded Wikipedia article.
 
-Answer ONLY using the context provided below.
+Use ONLY the provided context to answer the question.
 
-If the answer is not present in the context, say:
+The previous conversation is provided to help understand follow-up questions such as
+"he", "they", "that team", etc.
+
+If the answer is not available in the context, say:
+
 "I couldn't find that information in the provided Wikipedia article."
+
+----------------------------
+Previous Conversation
+----------------------------
+
+{history}
 
 ----------------------------
 Context
@@ -26,7 +43,7 @@ Context
 {context}
 
 ----------------------------
-Question
+Current Question
 ----------------------------
 
 {question}

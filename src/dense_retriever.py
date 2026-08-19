@@ -1,18 +1,14 @@
 from src.embeddings import EmbeddingGenerator
-from src.vector_store import VectorStore
 
 
 class Retriever:
-    """
-    Retrieves relevant document chunks for a user query.
-    """
 
-    def __init__(self):
+    def __init__(self, vector_store):
 
         self.embedder = EmbeddingGenerator()
-        self.vector_store = VectorStore()
+        self.vector_store = vector_store
 
-    def retrieve(self, query: str, n_results: int = 3):
+    def retrieve(self, query: str, n_results: int = 8):
 
         query_embedding = self.embedder.generate_embeddings([query])[0]
 

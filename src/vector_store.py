@@ -13,6 +13,15 @@ class VectorStore:
         self.collection = self.client.get_or_create_collection(
             name="wikipedia_articles"
         )
+        
+    def clear_collection(self):
+        """Removes all documents from the collection."""
+
+        self.client.delete_collection("wikipedia_articles")
+
+        self.collection = self.client.get_or_create_collection(
+            name="wikipedia_articles"
+    )
 
     def add_documents(self, chunks, embeddings, metadata):
 

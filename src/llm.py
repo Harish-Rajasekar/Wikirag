@@ -1,29 +1,37 @@
 import os
+from groq import Groq
 from dotenv import load_dotenv
-from google import genai
 
 
-class GeminiClient:
+class LLMClient:
     """
-    Handles communication with Google's Gemini models.
+    Handles communication with Groq LLMs.
     """
 
     def __init__(self):
 
         load_dotenv()
 
-        api_key = os.getenv("GOOGLE_API_KEY")
+        api_key = os.getenv("GROQ_API_KEY")
 
         if not api_key:
-            raise ValueError("GOOGLE_API_KEY not found.")
+            raise ValueError("GROQ_API_KEY not found in .env")
 
-        self.client = genai.Client(api_key=api_key)
+        self.client = Groq(api_key=api_key)
 
-    def generate_answer(self, prompt: str):
+        self.model = "llama-3.3-70b-versatile"
 
-        response = self.client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
+    def generate_answer(self, prompt):
+
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.2,
         )
 
-        return response.text
+        return response.choices[0].message.content
